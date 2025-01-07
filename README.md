@@ -31,7 +31,6 @@ gtkwave $PATH_TO_WAVEFORM_FILE
 ```
 
 8. Use GTKWave as needed
-
--Below is an image of what the lite desktop should look with GTKWave open with no file
+    - Below is an image of what the lite desktop should look with GTKWave open with no file
 
 ![GTKWave in noVNC desktop](docs/img/lite_desktop_gtkwave.png)
