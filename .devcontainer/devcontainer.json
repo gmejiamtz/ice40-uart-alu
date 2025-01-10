@@ -12,9 +12,13 @@
       "customizations": {
         "vscode": {
         "extensions": [
-          "wavetrace.wavetrace",
-          "GitHub.vscode-github-actions"
-      ]
+            "wavetrace.wavetrace",
+            "GitHub.vscode-github-actions",
+            "technosophos.vscode-make",
+            "rashwell.tcl",
+            "mshr-h.veriloghdl",
+            "ms-python.python"
+        ]
         }
       }
     }
