@@ -1,7 +1,7 @@
 
 module blinky_runner;
 
-localparam DATA_WIDTH_P = 0
+localparam DATA_WIDTH_P = 8
 
 logic clk_i;
 logic rst;
@@ -40,8 +40,8 @@ uart_tx #(DATA_WIDTH=DATA_WIDTH_P) uart_device(
     .prescale(uart_device_prescale_i)
 );
 
-always @(posedge led_o) $info("Led on");
-always @(negedge led_o) $info("Led off");
+always @(posedge uart_device_busy_o) $info("Uart Transmitter busy");
+always @(negedge uart_device_busy_o) $info("Uart Transmitter not busy!");
 
 task automatic reset;
     rst_ni <= 1;
@@ -49,12 +49,11 @@ task automatic reset;
     rst_ni <= 0;
 endtask
 
-task automatic wait_for_on;
-    while (!led_o) @(posedge led_o);
-endtask
-
-task automatic wait_for_off;
-    while (led_o) @(negedge led_o);
+task automatic send_data (input [DATA_WIDTH_P-1] data_in);
+    uart_device_data_i <= data_in;
+    uart_device_tvalid_i <= 1'b1;
+    while (uart_device_busy_o) @(posedge clk_i);
+    uart_device_tvalid_i <= 1'b0;
 endtask
 
 endmodule
