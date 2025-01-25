@@ -3,7 +3,7 @@ module uart_tb
     import dv_pkg::*;
     ;
 
-blinky_runner blinky_runner ();
+uart_runner uart_runner ();
 
 always begin
     $dumpfile( "dump.fst" );
@@ -11,14 +11,8 @@ always begin
     $display( "Begin simulation." );
     $urandom(100);
     $timeformat( -3, 3, "ms", 0);
-
-    blinky_runner.reset();
-
-    repeat(4) begin
-        blinky_runner.wait_for_on();
-        blinky_runner.wait_for_off();
-    end
-
+    uart_runner.reset();
+    uart_runner.send_data(8'hac);
     $display( "End simulation." );
     $finish;
 end
