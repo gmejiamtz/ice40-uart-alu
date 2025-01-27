@@ -26,12 +26,12 @@ end
 
 top #() top_uut (.clk(clk_i),
     .rst(rst),
-    .tx_i(uart_device_txd_o),
-    .data_o(data_o));
+    .rx_i(uart_device_txd_o),
+    .tx_o(data_o));
 
 uart_tx #(.DATA_WIDTH(DATA_WIDTH_P)) uart_device(
-    .clk(clk),
-    .rst(rst_ni),
+    .clk(clk_i),
+    .rst(rst),
     .s_axis_tdata(uart_device_data_i),
     .s_axis_tvalid(uart_device_tvalid_i),
     .s_axis_tready(uart_device_tready_o),
