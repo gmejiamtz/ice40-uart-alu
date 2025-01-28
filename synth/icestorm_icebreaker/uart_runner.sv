@@ -4,8 +4,8 @@ module uart_runner;
 reg CLK;
 reg BTN_N = 0;
 reg BTN1 = 0;
-wire LEDG_N;
 logic [7:0] data_i;
+wire LEDG_N;
 
 initial begin
     CLK = 0;
@@ -29,7 +29,6 @@ icebreaker icebreaker (
     .CLK(CLK),
     .BTN_N(BTN_N),
     .BTN1(BTN1),
-    .data_i(data_i),
     .LEDG_N(LEDG_N)
 );
 
@@ -42,9 +41,8 @@ task automatic reset;
 endtask
 
 task automatic send_data(input [7:0] data_in);
-    data_i <= data_in;
     BTN1 <= 1;
-    $info("Sending %h\n",data_in);
+    data_i <= data_in;
     @(posedge CLK);
 endtask
 
