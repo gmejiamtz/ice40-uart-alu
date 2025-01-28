@@ -2,14 +2,13 @@
 module icebreaker (
     input  wire CLK,
     input  wire BTN_N,
+    input  wire BTN1,
+    input wire [7:0] data_i,
     output wire LEDG_N
 );
 
 wire clk_12 = CLK;
 wire clk_50;
-
-wire led;
-assign LEDG_N = !led;
 
 // icepll -i 12 -o 50
 SB_PLL40_PAD #(
@@ -26,12 +25,12 @@ SB_PLL40_PAD #(
     .PLLOUTCORE(clk_50)
 );
 
-blinky #(
-    .ResetValue(5000000)
-) blinky (
-    .clk_i(clk_50),
-    .rst_ni(BTN_N),
-    .led_o(led)
+top #() top_uut (
+    .clk(clk_50),
+    .rst(!BTN_N),
+    .data_i(8'hac),
+    .t_valid_i(BTN1),
+    .tx_o(LEDG_N)
 );
 
 endmodule
