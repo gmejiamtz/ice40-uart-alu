@@ -4,6 +4,11 @@ module icebreaker (
     input  wire BTN_N,
     input  wire BTN1,
     input wire [7:0] data_i,
+    //-----------------------
+    input [7:0] t_valid_i,
+    output [7:0] data_o,
+    output tx_o
+    //-----------------------
     output wire LEDG_N
 );
 
@@ -24,6 +29,8 @@ SB_PLL40_PAD #(
     .PACKAGEPIN(clk_12),
     .PLLOUTCORE(clk_50)
 );
+
+top uart_top (.clk(clk_o), .rst(BTN_N), .data_i(data_i), .t_valid_i(t_valid_i), .tx_o(tx_o), .data_o(data_o));
 
 top #() top_uut (
     .clk(clk_50),
