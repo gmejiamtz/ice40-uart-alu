@@ -7,7 +7,7 @@ module top (
     output [7:0] data_o
 );
 
-logic t_ready_o,r_ready_i,r_valid_o;
+logic t_ready_o,r_valid_o;
 
 wire [7:0] actual_data_in;
 
