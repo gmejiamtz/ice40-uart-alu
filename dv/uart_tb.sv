@@ -4,7 +4,6 @@ module uart_tb
     ;
 
 uart_runner uart_runner ();
-
 always begin
     $dumpfile( "dump.fst" );
     $dumpvars;
@@ -13,6 +12,7 @@ always begin
     $timeformat( -3, 3, "ms", 0);
     uart_runner.reset();
     uart_runner.send_data(8'hac);
+    uart_runner.wait_cycle(256);
     $display( "End simulation." );
     $finish;
 end
