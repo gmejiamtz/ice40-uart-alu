@@ -1,12 +1,14 @@
 
 module icebreaker (
-    input  wire CLK,
-    input  wire BTN_N,
+    input wire CLK,
+    output wire RX,
+    input wire BTN_N,
     `ifndef SYNTHESIS
     input [7:0] data_i
     `endif
-    input  wire BTN1,
+    input wire BTN1,
     output wire LEDG_N
+    input wire TX
 );
 
 wire clk_12 = CLK;
@@ -27,7 +29,7 @@ SB_PLL40_PAD #(
     .PLLOUTCORE(clk_25)
 );
 
-top uart_top (.clk(clk_o), .rst(BTN_N), .data_i(8'hAC), .t_valid_i(t_valid_i), .tx_o(tx_o), .data_o(data_o));
+top uart_top (.clk(clk_o), .rst(BTN_N), .data_i(TX), .t_valid_i(t_valid_i), .tx_o(RX), .data_o(data_o));
 
 top #() top_uut (
     .clk(clk_25),
