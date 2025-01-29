@@ -6,7 +6,6 @@ localparam DATA_WIDTH_P = 8;
 logic clk_i;
 logic rst;
 logic top_tx_o;
-logic t_valid_i;
 
 //uart_device signals
 logic [DATA_WIDTH_P-1:0] uart_device_data_i, uart_device_data_o;
@@ -41,7 +40,7 @@ uart #(.DATA_WIDTH(DATA_WIDTH_P)) uart_device(
     .m_axis_tdata(uart_device_data_o),
     .m_axis_tvalid(uart_device_tvalid_o),
     .m_axis_tready(uart_device_tready_i),
-    .rxd(top_tx_o),
+    .rxd(uart_device_rxd_i),
     .txd(uart_device_txd_o),
     .tx_busy(uart_device_tx_busy_o),
     .rx_busy(uart_device_rx_busy_o),
@@ -57,7 +56,7 @@ task automatic reset;
     rst <= 1;
     uart_device_prescale_i <= 16'h1;
     uart_device_data_i <= '0;
-    uart_device_rxd_i <= '0;
+    uart_device_rxd_i <= top_tx_o;
     uart_device_tready_i <= '0;
     uart_device_tvalid_i <= '0;
     repeat (5) begin
