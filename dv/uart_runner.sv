@@ -41,7 +41,7 @@ uart #(.DATA_WIDTH(DATA_WIDTH_P)) uart_device(
     .m_axis_tdata(uart_device_data_o),
     .m_axis_tvalid(uart_device_tvalid_o),
     .m_axis_tready(uart_device_tready_i),
-    .rxd(uart_device_rxd_i),
+    .rxd(top_tx_o),
     .txd(uart_device_txd_o),
     .tx_busy(uart_device_tx_busy_o),
     .rx_busy(uart_device_rx_busy_o),
