@@ -46,7 +46,7 @@ uart #(.DATA_WIDTH(DATA_WIDTH_P)) uart_device(
     .rx_busy(uart_device_rx_busy_o),
     .rx_overrun_error(uart_device_rx_overrun_error_o),
     .rx_frame_error(uart_device_rx_frame_error_o),
-    .prescale(uart_device_prescale_i)
+    .prescale(1)
 );
 
 always @(posedge uart_device_tx_busy_o) $info("UART Transmitter busy!");
@@ -54,9 +54,8 @@ always @(negedge uart_device_rx_busy_o) $info("UART Receiver busy!");
 
 task automatic reset;
     rst <= 1;
-    uart_device_prescale_i <= 16'h1;
     uart_device_data_i <= '0;
-    uart_device_rxd_i <= top_tx_o;
+    uart_device_rxd_i <= '0;
     uart_device_tready_i <= '0;
     uart_device_tvalid_i <= '0;
     repeat (5) begin
