@@ -1,7 +1,7 @@
 module top (
     input clk,
     input rst,
-    input data_i,
+    input rx_i,
     output tx_o
 );
 
@@ -19,7 +19,7 @@ uart_rx #(.DATA_WIDTH(8)) uart_rx_inst (
     .m_axis_tdata(rx_o),
     .m_axis_tvalid(),
     .m_axis_tready(),
-    .rxd(data_i),
+    .rxd(rx_i),
     .busy(),
     .overrun_error(),
     .frame_error(),
