@@ -11,7 +11,7 @@ always begin
     $urandom(100);
     $timeformat( -3, 3, "ms", 0);
     uart_runner.reset();
-    uart_runner.send_data(8'hac);
+    uart_runner.uart_device_send_data(8'hac);
     uart_runner.wait_cycle(256);
     $display( "End simulation." );
     $finish;

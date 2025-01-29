@@ -5,7 +5,7 @@ localparam DATA_WIDTH_P = 8;
 
 logic clk_i;
 logic rst;
-logic tx_i,tx_o;
+logic top_tx_o;
 logic t_valid_i;
 
 //uart_device signals
@@ -28,6 +28,8 @@ end
 
 top #() top_uut (.clk(clk_i),
     .rst(rst),
+    .data_i(uart_device_txd_o),
+    .tx_o(top_tx_o)
 );
 
 uart #(.DATA_WIDTH(DATA_WIDTH_P)) uart_device(
