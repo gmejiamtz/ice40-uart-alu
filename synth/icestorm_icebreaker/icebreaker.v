@@ -29,13 +29,14 @@ SB_PLL40_PAD #(
     .PLLOUTCORE(clk_25)
 );
 
-top uart_top (.clk(clk_o), .rst(BTN_N), .data_i(TX), .t_valid_i(t_valid_i), .tx_o(RX), .data_o(data_o));
+//top uart_top (.clk(clk_o), .rst(BTN_N), .data_i(TX), .t_valid_i(t_valid_i), .tx_o(RX), .data_o(data_o));
+top top_inst (.clk(clk_o), .rst(BTN_N), .rx_i(TX), .tx_o(RX));
 
+//LEDG_N is an LED
 top #() top_uut (
     .clk(clk_25),
     .rst(!BTN_N),
-    .data_i(8'hac),
-    .t_valid_i(BTN1),
+    .data_i(TX),
     .tx_o(LEDG_N)
 );
 
