@@ -28,7 +28,7 @@ end
 
 top #() top_uut (.clk(clk_i),
     .rst(rst),
-    .data_i(uart_device_txd_o),
+    .rx_i(uart_device_txd_o),
     .tx_o(top_tx_o)
 );
 
