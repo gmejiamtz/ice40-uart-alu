@@ -54,7 +54,7 @@ always @(negedge uart_device_rx_busy_o) $info("UART Receiver busy!");
 
 task automatic reset;
     rst <= 1;
-    uart_device_prescale_i <= 16'h1;
+    uart_device_prescale_i <= 16'h35;
     uart_device_data_i <= '0;
     uart_device_rxd_i <= '0;
     uart_device_tready_i <= '0;
@@ -74,6 +74,7 @@ task automatic uart_device_send_data (input [DATA_WIDTH_P-1:0] data_in);
     $info("Sending %h\n",data_in);
     @(posedge clk_i);
     uart_device_tvalid_i <= 1'b0;
+    @(posedge uart_device_tready_o);
 endtask
 
 task automatic wait_cycle(integer n);
