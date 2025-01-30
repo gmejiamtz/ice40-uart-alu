@@ -28,14 +28,14 @@ logic pll_out;
 initial begin
     pll_out = 0;
     forever begin
-        #25.000ns; // 25MHz
+        #25.000ns; // 50MHz
         pll_out = !pll_out;
     end
 end
 assign icebreaker.pll.PLLOUTGLOBAL = pll_out;
 
 uart #() uart_device(
-    .clk(CLK),
+    .clk(pll_out),
     .rst(!BTN_N),
     .s_axis_tdata(uart_device_data_i),
     .s_axis_tvalid(uart_device_tvalid_i),
