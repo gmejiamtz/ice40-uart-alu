@@ -10,7 +10,7 @@ module alu (
 
 logic [32:0] add_init_const, mult_init_const;
 
-//note: probably need to switch add,mult,div to use std cell modules
+//note: probably need to switch add,mult,div to use basejump stl modules
 
 always_comb begin
 add_init_const = 32'b0;
