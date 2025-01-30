@@ -1,6 +1,6 @@
 
 dv/dv_pkg.sv
-
+dv/uart_runner.sv
 dv/uart_tb.sv
 
 --timing

@@ -21,7 +21,7 @@ case(opcode_i)
     8'hEC: data_o = data1_i;
 
     //addition
-    8'hAD data_o = add_init_const + data1_i;
+    8'hAD: data_o = add_init_const + data1_i;
 
     //multiply
     8'hAC: data_o = mult_init_const * data1_i;
