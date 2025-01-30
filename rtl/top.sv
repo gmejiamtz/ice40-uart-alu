@@ -6,7 +6,7 @@ module top (
 );
 
 logic [7:0] rx_data_out;
-logic rx_valid_out,rx_busy,tx_busy;
+logic rx_valid_out;
 
 uart_rx #(.DATA_WIDTH(8)) uart_rx_inst (
     .clk(clk),
