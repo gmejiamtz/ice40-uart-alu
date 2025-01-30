@@ -64,7 +64,7 @@ task automatic reset;
     uart_device_data_i <= '0;
     uart_device_rxd_i <= '0;
     uart_device_tready_i <= '1;
-    uart_device_tvalid_i <= '1;
+    uart_device_tvalid_i <= '0;
     repeat (5) begin
         @(posedge CLK);
     end
@@ -76,8 +76,10 @@ endtask
 
 task automatic uart_device_send_data(input [7:0] data_in);
     uart_device_data_i <= data_in;
+    uart_device_tvalid_i <= 1;
     $info("Sending %h\n",data_in);
     @(posedge CLK);
+    uart_device_tvalid_i <= 0;
     @(posedge uart_device_tready_o);
 endtask
 
