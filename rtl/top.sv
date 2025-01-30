@@ -15,7 +15,7 @@ uart_rx #(.DATA_WIDTH(8)) uart_rx_inst (
     .m_axis_tvalid(rx_valid_out), // output
     .m_axis_tready(1), // input
     .rxd(rx_i),
-    .busy(),
+    .busy(rx_busy),
     .overrun_error(),
     .frame_error(),
     .prescale(1)
@@ -28,7 +28,7 @@ uart_tx #(.DATA_WIDTH(8)) uart_tx_inst (
     .s_axis_tvalid(rx_valid_out), // input
     .s_axis_tready(), // output
     .txd(tx_o),
-    .busy(),
+    .busy(tx_busy),
     .prescale(1)
 );
 
