@@ -7,7 +7,7 @@ module icebreaker (
     input [7:0] data_i
     `endif
     input wire BTN1,
-    output wire LEDG_N
+    output wire LEDG_N,
     input wire TX
 );
 
@@ -36,7 +36,7 @@ top top_inst (.clk(clk_o), .rst(BTN_N), .rx_i(TX), .tx_o(RX));
 top #() top_uut (
     .clk(clk_25),
     .rst(!BTN_N),
-    .data_i(TX),
+    .rx_i(TX),
     .tx_o(LEDG_N)
 );
 
