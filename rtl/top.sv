@@ -18,7 +18,7 @@ uart_rx #(.DATA_WIDTH(8)) uart_rx_inst (
     .busy(),
     .overrun_error(),
     .frame_error(),
-    .prescale(1)
+    .prescale(16'd35)
 );
 
 uart_tx #(.DATA_WIDTH(8)) uart_tx_inst (
@@ -29,7 +29,7 @@ uart_tx #(.DATA_WIDTH(8)) uart_tx_inst (
     .s_axis_tready(), // output
     .txd(tx_o),
     .busy(),
-    .prescale(1)
+    .prescale(16'd35)
 );
 
 endmodule

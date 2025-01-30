@@ -28,7 +28,7 @@ logic pll_out;
 initial begin
     pll_out = 0;
     forever begin
-        #25.000ns; // 50MHz
+        #15.500ns; // 32.256MHz
         pll_out = !pll_out;
     end
 end
@@ -49,7 +49,7 @@ uart #() uart_device(
     .rx_busy(uart_device_rx_busy_o),
     .rx_overrun_error(uart_device_rx_overrun_error_o),
     .rx_frame_error(uart_device_rx_frame_error_o),
-    .prescale(1)
+    .prescale(16'd35)
 );
 
 icebreaker icebreaker (
