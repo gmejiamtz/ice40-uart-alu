@@ -52,7 +52,7 @@ uart #() uart_device(
 
 task automatic reset;
     rst <= 1;
-    uart_device_prescale_i <= 16'h1;
+    uart_device_prescale_i <= 16'h35;
     uart_device_data_i <= '0;
     uart_device_rxd_i <= '0;
     uart_device_tready_i <= '0;
