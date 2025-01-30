@@ -6,7 +6,7 @@ module top (
 );
 
 logic [7:0] rx_data_out;
-logic rx_valid_out,rx_busy,tx_busy;
+logic rx_valid_out;
 
 uart_rx #(.DATA_WIDTH(8)) uart_rx_inst (
     .clk(clk),
@@ -15,7 +15,7 @@ uart_rx #(.DATA_WIDTH(8)) uart_rx_inst (
     .m_axis_tvalid(rx_valid_out), // output
     .m_axis_tready(1), // input
     .rxd(rx_i),
-    .busy(rx_busy),
+    .busy(),
     .overrun_error(),
     .frame_error(),
     .prescale(1)
@@ -28,7 +28,7 @@ uart_tx #(.DATA_WIDTH(8)) uart_tx_inst (
     .s_axis_tvalid(rx_valid_out), // input
     .s_axis_tready(), // output
     .txd(tx_o),
-    .busy(tx_busy),
+    .busy(),
     .prescale(1)
 );
 
