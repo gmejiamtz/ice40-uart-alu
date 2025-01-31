@@ -1,10 +1,12 @@
 module FSM import config_pkg::*; (
     input clk,
     input rst,
-    input [7:0] data_i,
-    input valid_i,
-    output logic [7:0] data_o,
-    output logic valid_o,
+    input [7:0] data_i, //from upstream
+    input valid_i,      //from upstream
+    output logic ready_o,   //to upstream
+    output logic [7:0] data_o,  //to down
+    output logic valid_o,   //to down
+    input ready_i       //from down
 );
 
 logic [7:0] opcode_reg_q, opcode_reg_d, reserverd_reg_q, reserverd_reg_d, lsb_reg_q, lsb_reg_d,
@@ -117,11 +119,14 @@ always_comb begin
     lsb_reg_d = lsb_reg_q;
     opcode_reg_d = opcode_reg_q;
     valid_o = '0;
+    ready_o = '0;
     data_o = '0;
     data_length = {msb_reg_q,lsb_reg_q}; //4 frames are for metadata
     unique case(state_q)
         OPCODE: begin
+            ready_o = '1;
             if(packet_count_o == 0 && valid_i) begin
+                ready_o = '0;
                 if((data_i == ECHO) || (data_i == ADD) || (data_i == MUL) || (data_i == DIV)) begin
                     opcode_reg_d = data_i;
                     packet_up_i = 1;
@@ -130,20 +135,26 @@ always_comb begin
             end
         end
         RESERVED: begin
+            ready_o = '1;
             if(valid_i) begin
+                ready_o = '0;
                 packet_up_i = 1;
                 state_d = LSB;
             end
         end
         LSB: begin
+            ready_o = '1;
             if(valid_i) begin
+                ready_o = '0;
                 lsb_reg_d = data_i;
                 packet_up_i = 1;
                 state_d = MSB;
             end
         end
         MSB: begin
+            ready_o = '1;
             if(valid_i) begin // error check for if length is less than 4
+                ready_o = '0;
                 msb_reg_d = data_i;
                 packet_up_i = 1;
                 //if no data just go back to expect a new opcode
@@ -158,7 +169,9 @@ always_comb begin
             end
         end
         RS1: begin
+            ready_o = '1;
             if(valid_i) begin
+                ready_o = '0;
                 if((data_length != (packet_count_o)) && (rs1_count_o != 4)) begin
                     rs1_up_i = 1;
                     packet_up_i = 1;
@@ -173,7 +186,9 @@ always_comb begin
             end
         end
         RS2: begin
+            ready_o = '1;
             if(valid_i) begin
+                ready_o = '0;
                 if((data_length != (packet_count_o)) && (rs2_count_o != 4)) begin
                     rs2_up_i = 1;
                     packet_up_i = 1;
@@ -184,8 +199,10 @@ always_comb begin
             end
         end
         COMPUTE: begin
+            ready_o = '1;
             if(valid_i && packet_count_o != data_length) begin
-                if(opcode_reg_q == ECHO) begin
+                ready_o = '0;
+                if(opcode_reg_q == ECHO && ready_i) begin
                     valid_o = '1;
                     data_o = data_i;
                     packet_up_i = 1;
