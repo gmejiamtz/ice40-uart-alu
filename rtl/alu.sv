@@ -4,12 +4,30 @@ module alu import config_pkg::*; (
     input [7:0] opcode_i,
     input [1:0] top_byte,
     input [32:0] data1_i,
-    input [32:0] data2_i,
-    output [63:0] data_o;
+    input data1_valid_i,
+    input [32:0] data2_i
+    input data2_valid_i,
+    output [63:0] data_o,
+    output busy_o;
 );
 
 logic [32:0] add_init_const, mult_init_const;
 logic [5:0] shift_amount;
+logic [2:0] add_echo_packet_count;
+logic add_echo_packet_up;
+
+bsg_counter_up_down #(
+    .max_val_p(3'd4),
+    .init_val_p(0),
+    .max_step_p(1)
+    )
+    echo_add_shift_counter(
+        .clk_i(clk),
+        .reset_i(rst),
+        .up_i(add_echo_packet_up),
+        .down_i(0),
+        .count_o(add_echo_packet_count)
+    );
 
 select_byte select_byte_inst(
     .data_i(data1_i),
@@ -30,7 +48,9 @@ mult_init_const = 32'b1;
 case(opcode_i)
     //echo
     8'hEC: begin
-        data_o =
+        if(data1_valid_i) begin
+            data_o = data[]
+
 
     end
     //addition
