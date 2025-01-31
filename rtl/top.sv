@@ -7,14 +7,14 @@ module top (
 
 logic [7:0] rx_data_out, fsm_out;
 logic rx_valid_out;
-logic tx_ready;
+logic tx_ready, fsm_valid_out,fsm_is_ready;
 
 uart_rx #(.DATA_WIDTH(8)) uart_rx_inst (
     .clk(clk),
     .rst(rst),
     .m_axis_tdata(rx_data_out), // output
     .m_axis_tvalid(rx_valid_out), // output
-    .m_axis_tready(tx_ready), // input
+    .m_axis_tready(fsm_is_ready), // input
     .rxd(rx_i),
     .busy(),
     .overrun_error(),
@@ -27,7 +27,10 @@ FSM #() fsm (
     .rst(rst),
     .data_i(rx_data_out),
     .valid_i(rx_valid_out),
-    .tx_o(fsm_out)
+    .data_o(fsm_out),
+    .valid_o(fsm_valid_out),
+    .ready_i(tx_ready),
+    .ready_o(fsm_is_ready)
 );
 
 uart_tx #(.DATA_WIDTH(8)) uart_tx_inst (

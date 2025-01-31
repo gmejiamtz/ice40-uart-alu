@@ -13,3 +13,4 @@ rtl/top.sv
 rtl/alu.sv
 rtl/FSM.sv
 rtl/select_byte.sv
+rtl/shift_8.sv

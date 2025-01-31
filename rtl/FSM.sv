@@ -3,15 +3,17 @@ module FSM import config_pkg::*; (
     input rst,
     input [7:0] data_i,
     input valid_i,
-    output [7:0] data_o,
-    output valid_o,
-    input ready_i
+    output logic [7:0] data_o,
+    output logic valid_o,
+    input ready_i,
+    output logic ready_o
 );
 
 logic [7:0] opcode_reg_q, opcode_reg_d, reserverd_reg_q, reserverd_reg_d, lsb_reg_q, lsb_reg_d,
             msb_reg_q, msb_reg_d;
-logic packet_up_i, rs1_up_i;
-logic [15:0] count_o,data_length;
+logic packet_up_i, rs1_up_i,rs2_up_i,rs1_valid_d,rs1_valid_q,
+    rs2_valid_d,rs2_valid_q,start_alu,alu_busy,alu_valid;
+logic [15:0] packet_count_o,rs1_count_o,rs2_count_o,data_length;
 logic [31:0] rs1_reg_q, rs1_reg_d, rs2_reg_q, rs2_reg_d,rs1,rs2;
 logic [63:0] tx_reg_q,tx_req_d;
 state_t state_q, state_d;
@@ -20,6 +22,16 @@ always_ff @(posedge clk) begin
         state_q <= OPCODE;
     end else begin
         state_q <= state_d;
+    end
+end
+
+always_ff @(posedge clk) begin
+    if(rst) begin
+        rs1_valid_q <= '0;
+        rs2_valid_q <= '0;
+    end else begin
+        rs1_valid_q <= rs1_valid_d;
+        rs2_valid_q <= rs2_valid_d;
     end
 end
 
@@ -85,14 +97,27 @@ alu #() alu_inst(
     .clk(clk),
     .rst(rst),
     .opcode_i(opcode_reg_q),
+    .top_byte_i(packet_count_o[1:0]),
     .data1_i(rs1_reg_q),
+    .data1_valid_i(rs1_valid_q),
     .data2_i(rs2_reg_q),
-    .data_o(tx_req_d)
+    .data2_valid_i(rs2_valid_q),
+    .start_alu_i(start_alu),
+    .data_o(tx_req_d),
+    .busy_o(alu_busy),
+    .valid_o(alu_valid)
 );
 
 always_comb begin
+    state_d = state_q;
     packet_up_i = 0;
     rs1_up_i = 0;
+    rs2_up_i = 0;
+    rs1_valid_d = 0;
+    rs2_valid_d = 0;
+    msb_reg_d = msb_reg_q;
+    lsb_reg_d = lsb_reg_q;
+    opcode_reg_d = opcode_reg_q;
     data_length = {msb_reg_q,lsb_reg_q} - 4; //4 frames are for metadata
     unique case(state_q)
         OPCODE: begin
@@ -135,8 +160,10 @@ always_comb begin
             if((data_length != (packet_count_o - 4)) && (rs1_count_o != 4)) begin
                 rs1_up_i = 1;
             end else if (data_length != (packet_count_o - 4)) begin
+                rs1_valid_d = '1;
                 state_d = RS2;
             end else begin
+                rs1_valid_d = '1;
                 state_d = COMPUTE;
             end
         end
@@ -144,11 +171,19 @@ always_comb begin
             if((data_length != (packet_count_o - 4)) && (rs2_count_o != 4)) begin
                 rs2_up_i = 1;
             end else begin
+                rs2_valid_d = '1;
                 state_d = COMPUTE;
             end
         end
         COMPUTE: begin
+            if(state_q == ECHO) begin
+                valid_o = '1;
+                if(ready_i) begin
+                    data_o = data_i;
+                    ready_o = '1;
+                end
 
+            end
         end
 
     default: state_d = OPCODE;
