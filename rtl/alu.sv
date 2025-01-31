@@ -1,4 +1,4 @@
-module alu (
+module alu import config_pkg::*; (
     input clk,
     input rst,
     input [7:0] opcode_i,
