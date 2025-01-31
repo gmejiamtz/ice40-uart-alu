@@ -125,7 +125,7 @@ always_comb begin
     unique case(state_q)
         OPCODE: begin
             ready_o = '1;
-            if(packet_count_o == 0 && valid_i) begin
+            if(packet_count_o == 0 && valid_i && ready_o) begin
                 ready_o = '0;
                 if((data_i == ECHO) || (data_i == ADD) || (data_i == MUL) || (data_i == DIV)) begin
                     opcode_reg_d = data_i;
@@ -202,7 +202,6 @@ always_comb begin
         COMPUTE: begin
             ready_o = '1;
             if(valid_i && (packet_count_o != data_length) && ready_o) begin
-                ready_o = '0;
                 if(opcode_reg_q == ECHO && ready_i) begin
                     valid_o = '1;
                     data_o = data_i;
