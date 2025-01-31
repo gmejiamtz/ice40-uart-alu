@@ -188,7 +188,7 @@ always_comb begin
         end
         RS2: begin
             ready_o = '1;
-            if(valid_i && ready_i) begin
+            if(valid_i && ready_o) begin
                 ready_o = '0;
                 if((data_length != (packet_count_o)) && (rs2_count_o != 4)) begin
                     rs2_up_i = 1;
@@ -201,7 +201,7 @@ always_comb begin
         end
         COMPUTE: begin
             ready_o = '1;
-            if(valid_i && (packet_count_o != data_length) && ready_o) begin
+            if(valid_i && (packet_count_o != data_length)) begin
                 if(opcode_reg_q == ECHO && ready_i) begin
                     valid_o = '1;
                     data_o = data_i;
