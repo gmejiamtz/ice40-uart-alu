@@ -16,7 +16,7 @@ logic uart_device_tvalid_i,uart_device_tready_o,uart_device_rxd_i,
 logic [15:0] uart_device_prescale_i;
 
 
-localparam realtime ClockPeriod = 31ns;
+localparam realtime ClockPeriod = 36.036ns;
 
 initial begin
     clk_i = 0;
@@ -47,7 +47,7 @@ uart #() uart_device(
     .rx_busy(uart_device_rx_busy_o),
     .rx_overrun_error(uart_device_rx_overrun_error_o),
     .rx_frame_error(uart_device_rx_frame_error_o),
-    .prescale(16'd35)
+    .prescale(16'd30)
 );
 
 task automatic reset;

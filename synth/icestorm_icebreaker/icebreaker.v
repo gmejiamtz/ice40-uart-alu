@@ -7,13 +7,13 @@ module icebreaker (
 );
 
 wire clk_12 = CLK;
-wire clk_32_256;
+wire clk_27_750;
 
 // icepll -i 12 -o 32.256
 SB_PLL40_PAD #(
     .FEEDBACK_PATH("SIMPLE"),
     .DIVR(4'd0),
-    .DIVF(7'd85),
+    .DIVF(7'd73),
     .DIVQ(3'd5),
     .FILTER_RANGE(3'd1)
 ) pll (
@@ -21,10 +21,10 @@ SB_PLL40_PAD #(
     .RESETB(1'b1),
     .BYPASS(1'b0),
     .PACKAGEPIN(clk_12),
-    .PLLOUTGLOBAL(clk_32_256)
+    .PLLOUTGLOBAL(clk_27_750)
 );
 
 
-top top_inst (.clk(clk_32_256), .rst(!BTN_N), .rx_i(RX), .tx_o(TX));
+top top_inst (.clk(clk_27_750), .rst(!BTN_N), .rx_i(RX), .tx_o(TX));
 
 endmodule
