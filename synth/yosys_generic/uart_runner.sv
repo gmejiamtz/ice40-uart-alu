@@ -72,14 +72,18 @@ task automatic uart_device_send_data (input [DATA_WIDTH_P-1:0] data_in);
     $info("Sending %h\n",data_in);
     @(posedge clk_i);
     uart_device_tvalid_i <= 0;
-    @(posedge uart_device_tready_o);
-    @(negedge uart_device_rx_busy_o);
+    @(posedge uart_device_tx_busy_o);
+    @(negedge uart_device_tx_busy_o);
 endtask
 
 task automatic wait_cycle(integer n);
     repeat (n) begin
         @(posedge clk_i);
     end
+endtask
+
+task automatic wait_for_rx;
+    @(negedge uart_device_rx_busy_o);
 endtask
 
 endmodule

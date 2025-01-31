@@ -23,7 +23,6 @@ always begin
     uart_runner.wait_cycle(1);
     uart_runner.uart_device_send_data(8'h69);
     uart_runner.wait_cycle(2000);
-    uart_runner.wait_for_rx();
     uart_runner.wait_cycle(2000);
     $display( "End simulation." );
     $finish;
