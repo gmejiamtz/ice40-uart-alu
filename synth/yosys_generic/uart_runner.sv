@@ -47,7 +47,7 @@ uart #() uart_device(
     .rx_busy(uart_device_rx_busy_o),
     .rx_overrun_error(uart_device_rx_overrun_error_o),
     .rx_frame_error(uart_device_rx_frame_error_o),
-    .prescale(uart_device_prescale_i)
+    .prescale(16'd35)
 );
 
 task automatic reset;
