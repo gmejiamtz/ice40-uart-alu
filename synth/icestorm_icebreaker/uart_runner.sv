@@ -54,7 +54,7 @@ uart #() uart_device(
 
 icebreaker icebreaker (
     .CLK(CLK),
-    .BTN_N(!BTN_N),
+    .BTN_N(BTN_N),
     .RX(uart_device_txd_o),
     .TX(TX)
 );
@@ -69,7 +69,7 @@ task automatic reset;
         @(posedge CLK);
     end
     BTN_N <= 1;
-    repeat (50) begin
+    repeat (5) begin
         @(posedge CLK);
     end
 endtask
@@ -80,14 +80,18 @@ task automatic uart_device_send_data(input [7:0] data_in);
     $info("Sending %h\n",data_in);
     @(posedge CLK);
     uart_device_tvalid_i <= 0;
-    @(posedge uart_device_tready_o);
-    @(negedge uart_device_rx_busy_o);
+    //@(posedge uart_device_tx_busy_o);
+    @(negedge uart_device_tx_busy_o);
 endtask
 
 task automatic wait_cycle(integer n);
     repeat (n) begin
         @(posedge CLK);
     end
+endtask
+
+task automatic wait_for_rx;
+    @(negedge uart_device_rx_busy_o);
 endtask
 
 endmodule
