@@ -71,6 +71,7 @@ always_comb begin
     data2_reg_d = '0;
     valid_o = '0;
     packets_to_process = ~|top_byte_i ? 3'd4 : top_byte_i;
+    data_o = '0;
     if(data1_valid_i & start_alu_i & ~busy_o) begin
         data1_reg_d = data1_i;
         busy_d = 1;

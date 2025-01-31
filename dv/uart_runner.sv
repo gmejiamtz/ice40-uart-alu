@@ -74,7 +74,6 @@ task automatic uart_device_send_data (input [DATA_WIDTH_P-1:0] data_in);
     $info("Sending %h\n",data_in);
     @(posedge clk_i);
     uart_device_tvalid_i <= 1'b0;
-    @(posedge uart_device_tx_busy_o);
     @(negedge uart_device_tx_busy_o);
 endtask
 
