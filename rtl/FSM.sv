@@ -118,7 +118,7 @@ always_comb begin
     opcode_reg_d = opcode_reg_q;
     valid_o = '0;
     data_o = '0;
-    data_length = {msb_reg_q,lsb_reg_q} - 4; //4 frames are for metadata
+    data_length = {msb_reg_q,lsb_reg_q}; //4 frames are for metadata
     unique case(state_q)
         OPCODE: begin
             if(packet_count_o == 0 && valid_i) begin
@@ -159,7 +159,7 @@ always_comb begin
         end
         RS1: begin
             if(valid_i) begin
-                if((data_length != (packet_count_o - 4)) && (rs1_count_o != 4)) begin
+                if((data_length != (packet_count_o)) && (rs1_count_o != 4)) begin
                     rs1_up_i = 1;
                     packet_up_i = 1;
                 end else if (data_length != (packet_count_o - 4)) begin
@@ -174,7 +174,7 @@ always_comb begin
         end
         RS2: begin
             if(valid_i) begin
-                if((data_length != (packet_count_o - 4)) && (rs2_count_o != 4)) begin
+                if((data_length != (packet_count_o)) && (rs2_count_o != 4)) begin
                     rs2_up_i = 1;
                     packet_up_i = 1;
                 end else begin
@@ -184,14 +184,17 @@ always_comb begin
             end
         end
         COMPUTE: begin
-            if(valid_i) begin
-                if(opcode_reg_q == ECHO && ((packet_count_o - 4) != data_length)) begin
+            if(valid_i && packet_count_o != data_length) begin
+                if(opcode_reg_q == ECHO) begin
                     valid_o = '1;
                     data_o = data_i;
                     packet_up_i = 1;
-                end else begin
-                    state_d = OPCODE;
+                    state_d = COMPUTE;
                 end
+            end else if (packet_count_o == data_length) begin
+                state_d = OPCODE;
+                data_o = '0;
+                valid_o = '0;
             end
         end
     default: state_d = OPCODE;
