@@ -5,7 +5,7 @@ module top (
     output tx_o
 );
 
-logic [7:0] rx_data_out;
+logic [7:0] rx_data_out, fsm_out;
 logic rx_valid_out;
 logic tx_ready;
 
@@ -22,10 +22,18 @@ uart_rx #(.DATA_WIDTH(8)) uart_rx_inst (
     .prescale(16'd35)
 );
 
+FSM #() fsm (
+    .clk(clk),
+    .rst(rst),
+    .data_i(rx_data_out),
+    .valid_i(rx_valid_out),
+    .tx_o(fsm_out)
+);
+
 uart_tx #(.DATA_WIDTH(8)) uart_tx_inst (
     .clk(clk),
     .rst(rst),
-    .s_axis_tdata(rx_data_out), // input
+    .s_axis_tdata(fsm_out), // input
     .s_axis_tvalid(rx_valid_out), // input
     .s_axis_tready(tx_ready), // output
     .txd(tx_o),

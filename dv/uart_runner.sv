@@ -15,7 +15,7 @@ logic uart_device_tvalid_i,uart_device_tready_o,uart_device_rxd_i,
     uart_device_rx_overrun_error_o, uart_device_rx_frame_error_o;
 logic [15:0] uart_device_prescale_i;
 
-localparam realtime ClockPeriod = 5ms;
+localparam realtime ClockPeriod = 31ns;
 
 initial begin
     clk_i = 0;
@@ -40,13 +40,13 @@ uart #(.DATA_WIDTH(DATA_WIDTH_P)) uart_device(
     .m_axis_tdata(uart_device_data_o),
     .m_axis_tvalid(uart_device_tvalid_o),
     .m_axis_tready(uart_device_tready_i),
-    .rxd(uart_device_rxd_i),
+    .rxd(top_tx_o),
     .txd(uart_device_txd_o),
     .tx_busy(uart_device_tx_busy_o),
     .rx_busy(uart_device_rx_busy_o),
     .rx_overrun_error(uart_device_rx_overrun_error_o),
     .rx_frame_error(uart_device_rx_frame_error_o),
-    .prescale(uart_device_prescale_i)
+    .prescale(16'd35)
 );
 
 always @(posedge uart_device_tx_busy_o) $info("UART Transmitter busy!");
@@ -75,6 +75,7 @@ task automatic uart_device_send_data (input [DATA_WIDTH_P-1:0] data_in);
     @(posedge clk_i);
     uart_device_tvalid_i <= 1'b0;
     @(posedge uart_device_tready_o);
+    @(negedge uart_device_rx_busy_o);
 endtask
 
 task automatic wait_cycle(integer n);

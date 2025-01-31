@@ -11,3 +11,4 @@ rtl/config_pkg.sv
 
 rtl/top.sv
 rtl/alu.sv
+rtl/FSM.sv

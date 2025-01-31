@@ -63,7 +63,7 @@ task automatic reset;
     BTN_N <= 0;
     uart_device_data_i <= '0;
     uart_device_rxd_i <= '0;
-    uart_device_tready_i <= '1;
+    uart_device_tready_i <= '0;
     uart_device_tvalid_i <= '0;
     repeat (5) begin
         @(posedge CLK);
@@ -81,6 +81,7 @@ task automatic uart_device_send_data(input [7:0] data_in);
     @(posedge CLK);
     uart_device_tvalid_i <= 0;
     @(posedge uart_device_tready_o);
+    @(negedge uart_device_rx_busy_o);
 endtask
 
 task automatic wait_cycle(integer n);
