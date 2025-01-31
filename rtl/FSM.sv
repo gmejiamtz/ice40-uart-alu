@@ -131,12 +131,13 @@ always_comb begin
                     opcode_reg_d = data_i;
                     packet_up_i = 1;
                     state_d = RESERVED;
+                    ready_o = '0;
                 end
             end
         end
         RESERVED: begin
             ready_o = '1;
-            if(valid_i) begin
+            if(valid_i && ready_o) begin
                 ready_o = '0;
                 packet_up_i = 1;
                 state_d = LSB;
@@ -144,7 +145,7 @@ always_comb begin
         end
         LSB: begin
             ready_o = '1;
-            if(valid_i) begin
+            if(valid_i && ready_o) begin
                 ready_o = '0;
                 lsb_reg_d = data_i;
                 packet_up_i = 1;
@@ -153,7 +154,7 @@ always_comb begin
         end
         MSB: begin
             ready_o = '1;
-            if(valid_i) begin // error check for if length is less than 4
+            if(valid_i && ready_o) begin // error check for if length is less than 4
                 ready_o = '0;
                 msb_reg_d = data_i;
                 packet_up_i = 1;
@@ -170,7 +171,7 @@ always_comb begin
         end
         RS1: begin
             ready_o = '1;
-            if(valid_i) begin
+            if(valid_i && ready_o) begin
                 ready_o = '0;
                 if((data_length != (packet_count_o)) && (rs1_count_o != 4)) begin
                     rs1_up_i = 1;
@@ -187,7 +188,7 @@ always_comb begin
         end
         RS2: begin
             ready_o = '1;
-            if(valid_i) begin
+            if(valid_i && ready_i) begin
                 ready_o = '0;
                 if((data_length != (packet_count_o)) && (rs2_count_o != 4)) begin
                     rs2_up_i = 1;
@@ -200,7 +201,7 @@ always_comb begin
         end
         COMPUTE: begin
             ready_o = '1;
-            if(valid_i && packet_count_o != data_length) begin
+            if(valid_i && (packet_count_o != data_length) && ready_o) begin
                 ready_o = '0;
                 if(opcode_reg_q == ECHO && ready_i) begin
                     valid_o = '1;
