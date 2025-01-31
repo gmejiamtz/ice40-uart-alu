@@ -5,8 +5,6 @@ module FSM import config_pkg::*; (
     input valid_i,
     output logic [7:0] data_o,
     output logic valid_o,
-    input ready_i,
-    output logic ready_o
 );
 
 logic [7:0] opcode_reg_q, opcode_reg_d, reserverd_reg_q, reserverd_reg_d, lsb_reg_q, lsb_reg_d,
@@ -118,6 +116,8 @@ always_comb begin
     msb_reg_d = msb_reg_q;
     lsb_reg_d = lsb_reg_q;
     opcode_reg_d = opcode_reg_q;
+    valid_o = '0;
+    data_o = '0;
     data_length = {msb_reg_q,lsb_reg_q} - 4; //4 frames are for metadata
     unique case(state_q)
         OPCODE: begin
@@ -151,6 +151,7 @@ always_comb begin
                     state_d = OPCODE;
                 end else if(opcode_reg_q == ECHO) begin
                     state_d = COMPUTE;
+                    data_o = valid_i ? data_i : '0;
                 end else begin
                     state_d = RS1;
                 end
@@ -159,9 +160,11 @@ always_comb begin
         RS1: begin
             if((data_length != (packet_count_o - 4)) && (rs1_count_o != 4)) begin
                 rs1_up_i = 1;
+                packet_up_i = 1;
             end else if (data_length != (packet_count_o - 4)) begin
                 rs1_valid_d = '1;
                 state_d = RS2;
+                packet_up_i = 1;
             end else begin
                 rs1_valid_d = '1;
                 state_d = COMPUTE;
@@ -170,22 +173,23 @@ always_comb begin
         RS2: begin
             if((data_length != (packet_count_o - 4)) && (rs2_count_o != 4)) begin
                 rs2_up_i = 1;
+                packet_up_i = 1;
             end else begin
                 rs2_valid_d = '1;
                 state_d = COMPUTE;
             end
         end
         COMPUTE: begin
-            if(state_q == ECHO) begin
-                valid_o = '1;
-                if(ready_i) begin
+            if(opcode_reg_q == ECHO && ((packet_count_o - 4) != data_length)) begin
+                if(valid_i) begin
+                    valid_o = '1;
                     data_o = data_i;
-                    ready_o = '1;
+                    packet_up_i = 1;
                 end
-
+            end else begin
+                state_d = OPCODE;
             end
         end
-
     default: state_d = OPCODE;
     endcase
 end
