@@ -13,7 +13,7 @@ wire clk_27_750;
 SB_PLL40_PAD #(
     .FEEDBACK_PATH("SIMPLE"),
     .DIVR(4'd0),
-    .DIVF(7'd75),
+    .DIVF(7'd85),
     .DIVQ(3'd5),
     .FILTER_RANGE(3'd1)
 ) pll (

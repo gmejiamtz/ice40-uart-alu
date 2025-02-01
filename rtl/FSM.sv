@@ -9,11 +9,11 @@ module FSM import config_pkg::*; (
     input ready_i       //from down
 );
 
-logic [7:0] opcode_reg_q, opcode_reg_d, reserverd_reg_q, reserverd_reg_d, lsb_reg_q, lsb_reg_d,
+logic [7:0] packet_count_o,opcode_reg_q, opcode_reg_d, reserverd_reg_q, reserverd_reg_d, lsb_reg_q, lsb_reg_d,
             msb_reg_q, msb_reg_d;
 logic packet_up_i, rs1_up_i,rs2_up_i,rs1_valid_d,rs1_valid_q,
     rs2_valid_d,rs2_valid_q,start_alu,alu_busy,alu_valid;
-logic [15:0] packet_count_o,rs1_count_o,rs2_count_o,data_length;
+logic [15:0] rs1_count_o,rs2_count_o,data_length;
 logic [31:0] rs1_reg_q, rs1_reg_d, rs2_reg_q, rs2_reg_d,rs1,rs2;
 logic [63:0] tx_reg_q,tx_req_d;
 state_t state_q, state_d;
@@ -51,7 +51,7 @@ always_ff @(posedge clk) begin
     end
 end
 
-bsg_counter_up_down #(.max_val_p(16'd65535),
+bsg_counter_up_down #(.max_val_p(8'd255),
                       .init_val_p(0),
                       .max_step_p(1))
 packet_counter(
@@ -128,7 +128,7 @@ always_comb begin
     unique case(state_q)
         OPCODE: begin
             ready_o = '1;
-            if(packet_count_o == 0 && valid_i && ready_o) begin
+            if( ~|packet_count_o && valid_i && ready_o) begin
                 ready_o = '0;
                 if((data_i == ECHO) || (data_i == ADD) || (data_i == MUL) || (data_i == DIV)) begin
                     opcode_reg_d = data_i;
@@ -219,14 +219,14 @@ always_comb begin
         end
         COMPUTE: begin
             ready_o = '1;
-            if(valid_i && (packet_count_o <= data_length)) begin
+            if(valid_i && ready_o && (packet_count_o != data_length)) begin
                 if(opcode_reg_q == ECHO && ready_i) begin
                     valid_o = '1;
                     data_o = data_i;
                     packet_up_i = 1;
                     state_d = COMPUTE;
                 end
-            end else if (packet_count_o > data_length) begin
+            end else if (packet_count_o == data_length) begin
                 state_d = OPCODE;
                 data_o = '0;
                 valid_o = '0;

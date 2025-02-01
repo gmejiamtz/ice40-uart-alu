@@ -19,7 +19,7 @@ uart_rx #(.DATA_WIDTH(8)) uart_rx_inst (
     .busy(),
     .overrun_error(),
     .frame_error(),
-    .prescale(16'd31)
+    .prescale(16'd35)
 );
 
 FSM #() fsm (
@@ -41,7 +41,7 @@ uart_tx #(.DATA_WIDTH(8)) uart_tx_inst (
     .s_axis_tready(tx_ready), // output
     .txd(tx_o),
     .busy(),
-    .prescale(16'd31)
+    .prescale(16'd35)
 );
 
 endmodule

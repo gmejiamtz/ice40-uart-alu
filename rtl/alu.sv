@@ -96,10 +96,10 @@ always_comb begin
             end
         end
         //addition
-        8'hAD: data_o = data1_i + data2_i;
+        8'hAD: data_o = '0;
 
         //multiply
-        8'hAC: data_o = data1_i * data2_i;
+        8'hAC: data_o = '0;
 
         //division, we need to change this
         //sean was thinking we do a system where we take the first rx_i then divide by 1,
