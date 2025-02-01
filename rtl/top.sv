@@ -14,7 +14,7 @@ uart_rx #(.DATA_WIDTH(8)) uart_rx_inst (
     .rst(rst),
     .m_axis_tdata(rx_data_out), // output
     .m_axis_tvalid(rx_valid_out), // output
-    .m_axis_tready(tx_ready), // input
+    .m_axis_tready(fsm_is_ready), // input
     .rxd(rx_i),
     .busy(),
     .overrun_error(),
@@ -27,8 +27,10 @@ FSM #() fsm (
     .rst(rst),
     .data_i(rx_data_out),
     .valid_i(rx_valid_out),
+    .ready_o(fsm_is_ready),  //can fsm receive rn
     .data_o(fsm_out),
-    .valid_o(fsm_valid_out)
+    .valid_o(fsm_valid_out),
+    .ready_i(tx_ready) //can the tx transmit right now?
 );
 
 uart_tx #(.DATA_WIDTH(8)) uart_tx_inst (

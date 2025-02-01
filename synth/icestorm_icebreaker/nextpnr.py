@@ -1,3 +1,3 @@
 
 ctx.addClock('clk_12', 12)
-ctx.addClock('clk_32_256', 32.256)
+ctx.addClock('clk_27_750', 32.256)

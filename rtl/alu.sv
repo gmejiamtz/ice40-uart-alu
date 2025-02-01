@@ -71,6 +71,7 @@ always_comb begin
     data2_reg_d = '0;
     valid_o = '0;
     packets_to_process = ~|top_byte_i ? 3'd4 : top_byte_i;
+    data_o = '0;
     if(data1_valid_i & start_alu_i & ~busy_o) begin
         data1_reg_d = data1_i;
         busy_d = 1;
@@ -95,10 +96,10 @@ always_comb begin
             end
         end
         //addition
-        8'hAD: data_o = data1_i + data2_i;
+        8'hAD: data_o = '0;
 
         //multiply
-        8'hAC: data_o = data1_i * data2_i;
+        8'hAC: data_o = '0;
 
         //division, we need to change this
         //sean was thinking we do a system where we take the first rx_i then divide by 1,

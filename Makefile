@@ -24,7 +24,7 @@ lint:
 
 sim:
 	verilator lint/verilator.vlt --Mdir ${TOP}_$@_dir -f rtl/rtl.f -f dv/pre_synth.f -f dv/dv.f --binary -Wno-fatal --top ${TOP}
-	./${TOP}_$@_dir/V${TOP} +verilator+rand+reset+0
+	./${TOP}_$@_dir/V${TOP} +verilator+rand+reset+1
 
 synth/build/rtl.sv2v.v: ${RTL} rtl/rtl.f
 	mkdir -p $(dir $@)
@@ -32,15 +32,15 @@ synth/build/rtl.sv2v.v: ${RTL} rtl/rtl.f
 
 gls: synth/yosys_generic/build/synth.v
 	verilator lint/verilator.vlt --Mdir ${TOP}_$@_dir -f synth/yosys_generic/gls.f -f dv/dv.f --binary -Wno-fatal --top ${TOP}
-	./${TOP}_$@_dir/V${TOP} +verilator+rand+reset+0
+	./${TOP}_$@_dir/V${TOP} +verilator+rand+reset+1
 
 synth/yosys_generic/build/synth.v: synth/build/rtl.sv2v.v synth/yosys_generic/yosys.tcl
 	mkdir -p $(dir $@)
 	yosys -p 'tcl synth/yosys_generic/yosys.tcl synth/build/rtl.sv2v.v' -l synth/yosys_generic/build/yosys.log
 
 icestorm_icebreaker_gls: synth/icestorm_icebreaker/build/synth.v
-	verilator lint/verilator.vlt --Mdir ${TOP}_$@_dir -f synth/icestorm_icebreaker/gls.f -f dv/dv.f --binary -Wno-fatal --top ${TOP}
-	./${TOP}_$@_dir/V${TOP} +verilator+rand+reset+0
+	verilator lint/verilator.vlt --Mdir ${TOP}_$@_dir -f synth/icestorm_icebreaker/gls.f -f dv/dv.f --binary -Wno-fatal --top ${TOP} --x-assign 1
+	./${TOP}_$@_dir/V${TOP} +verilator+rand+reset+1
 
 synth/icestorm_icebreaker/build/synth.v synth/icestorm_icebreaker/build/synth.json: synth/build/rtl.sv2v.v synth/icestorm_icebreaker/icebreaker.v synth/icestorm_icebreaker/yosys.tcl
 	mkdir -p $(dir $@)
@@ -53,6 +53,7 @@ synth/icestorm_icebreaker/build/icebreaker.asc: synth/icestorm_icebreaker/build/
 	 --package sg48 \
 	 --pre-pack synth/icestorm_icebreaker/nextpnr.py \
 	 --pcf synth/icestorm_icebreaker/netpnr.pcf \
+	 --report synth/icestorm_icebreaker/build/timing.json \
 	 --asc $@
 
 %.bit: %.asc

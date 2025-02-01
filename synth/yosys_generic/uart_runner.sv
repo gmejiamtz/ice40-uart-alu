@@ -5,7 +5,7 @@ localparam DATA_WIDTH_P = 8;
 
 logic clk_i;
 logic rst;
-logic top_tx_o;
+logic top_tx, top_rx;
 
 //uart_device signals
 logic [DATA_WIDTH_P-1:0] uart_device_data_i, uart_device_data_o;
@@ -21,6 +21,8 @@ localparam realtime ClockPeriod = 31ns;
 initial begin
     clk_i = 0;
     forever begin
+        top_rx = uart_device_txd_o;
+        uart_device_rxd_i = top_tx;
         #(ClockPeriod/2);
         clk_i = !clk_i;
     end
@@ -28,8 +30,8 @@ end
 
 top #() top_uut (.clk(clk_i),
     .rst(rst),
-    .rx_i(uart_device_txd_o),
-    .tx_o(top_tx_o)
+    .rx_i(top_rx),
+    .tx_o(top_tx)
 );
 
 uart #() uart_device(
@@ -41,7 +43,7 @@ uart #() uart_device(
     .m_axis_tdata(uart_device_data_o),
     .m_axis_tvalid(uart_device_tvalid_o),
     .m_axis_tready(uart_device_tready_i),
-    .rxd(top_tx_o),
+    .rxd(uart_device_rxd_i),
     .txd(uart_device_txd_o),
     .tx_busy(uart_device_tx_busy_o),
     .rx_busy(uart_device_rx_busy_o),
@@ -72,7 +74,6 @@ task automatic uart_device_send_data (input [DATA_WIDTH_P-1:0] data_in);
     $info("Sending %h\n",data_in);
     @(posedge clk_i);
     uart_device_tvalid_i <= 0;
-    @(posedge uart_device_tx_busy_o);
     @(negedge uart_device_tx_busy_o);
 endtask
 

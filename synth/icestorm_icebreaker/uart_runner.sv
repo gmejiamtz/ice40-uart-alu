@@ -18,17 +18,24 @@ logic [15:0] uart_device_prescale_i;
 
 initial begin
     CLK = 0;
+    RX = uart_device_txd_o;
+    uart_device_rxd_i = TX;
     forever begin
         #41.666ns; // 12MHz
         CLK = !CLK;
     end
 end
 
+localparam realtime ClockPeriod = 36.036ns;
+
+
 logic pll_out;
 initial begin
     pll_out = 0;
     forever begin
-        #15.500ns; // 32.256MHz
+        RX = uart_device_txd_o;
+        uart_device_rxd_i = TX;
+        #(ClockPeriod/2); // 32.256MHz
         pll_out = !pll_out;
     end
 end
@@ -43,7 +50,7 @@ uart #() uart_device(
     .m_axis_tdata(uart_device_data_o),
     .m_axis_tvalid(uart_device_tvalid_o),
     .m_axis_tready(uart_device_tready_i),
-    .rxd(TX),
+    .rxd(uart_device_rxd_i),
     .txd(uart_device_txd_o),
     .tx_busy(uart_device_tx_busy_o),
     .rx_busy(uart_device_rx_busy_o),
@@ -55,7 +62,7 @@ uart #() uart_device(
 icebreaker icebreaker (
     .CLK(CLK),
     .BTN_N(BTN_N),
-    .RX(uart_device_txd_o),
+    .RX(RX),
     .TX(TX)
 );
 
@@ -80,7 +87,6 @@ task automatic uart_device_send_data(input [7:0] data_in);
     $info("Sending %h\n",data_in);
     @(posedge CLK);
     uart_device_tvalid_i <= 0;
-    //@(posedge uart_device_tx_busy_o);
     @(negedge uart_device_tx_busy_o);
 endtask
 
