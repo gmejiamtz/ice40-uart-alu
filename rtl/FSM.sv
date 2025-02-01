@@ -118,6 +118,9 @@ always_comb begin
     msb_reg_d = msb_reg_q;
     lsb_reg_d = lsb_reg_q;
     opcode_reg_d = opcode_reg_q;
+    reserverd_reg_d = reserverd_reg_q;
+    rs1_reg_d = rs1_reg_q;
+    rs2_reg_d = rs2_reg_q;
     valid_o = '0;
     ready_o = '0;
     data_o = '0;
@@ -216,14 +219,14 @@ always_comb begin
         end
         COMPUTE: begin
             ready_o = '1;
-            if(valid_i && (packet_count_o != data_length)) begin
+            if(valid_i && (packet_count_o <= data_length)) begin
                 if(opcode_reg_q == ECHO && ready_i) begin
                     valid_o = '1;
                     data_o = data_i;
                     packet_up_i = 1;
                     state_d = COMPUTE;
                 end
-            end else if (packet_count_o == data_length) begin
+            end else if (packet_count_o > data_length) begin
                 state_d = OPCODE;
                 data_o = '0;
                 valid_o = '0;
