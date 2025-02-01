@@ -12,7 +12,7 @@ module FSM import config_pkg::*; (
 logic [7:0] packet_count_o,opcode_reg_q, opcode_reg_d, reserverd_reg_q, reserverd_reg_d, lsb_reg_q, lsb_reg_d,
             msb_reg_q, msb_reg_d;
 logic packet_up_i, rs1_up_i,rs2_up_i,rs1_valid_d,rs1_valid_q,
-    rs2_valid_d,rs2_valid_q,start_alu,alu_busy,alu_valid;
+    rs2_valid_d,rs2_valid_q,start_alu,alu_busy,alu_valid,packet_count_rst;
 logic [15:0] rs1_count_o,rs2_count_o,data_length;
 logic [31:0] rs1_reg_q, rs1_reg_d, rs2_reg_q, rs2_reg_d,rs1,rs2;
 logic [63:0] tx_reg_q,tx_req_d;
@@ -56,7 +56,7 @@ bsg_counter_up_down #(.max_val_p(8'd255),
                       .max_step_p(1))
 packet_counter(
     .clk_i(clk),
-    .reset_i(rst),
+    .reset_i(rst | packet_count_rst),
     .up_i(packet_up_i),
     .down_i(0),
     .count_o(packet_count_o)
@@ -110,6 +110,7 @@ alu #() alu_inst(
 
 always_comb begin
     state_d = state_q;
+    packet_count_rst = '0;
     packet_up_i = 0;
     rs1_up_i = 0;
     rs2_up_i = 0;
@@ -236,6 +237,7 @@ always_comb begin
                 rs2_reg_d = '0;
                 opcode_reg_d = '0;
                 reserverd_reg_d = '0;
+                packet_count_rst = '1;
             end
         end
     default: state_d = OPCODE;
