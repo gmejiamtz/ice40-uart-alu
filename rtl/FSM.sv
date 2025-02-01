@@ -227,6 +227,12 @@ always_comb begin
                 state_d = OPCODE;
                 data_o = '0;
                 valid_o = '0;
+                lsb_reg_d = '0;
+                msb_reg_d = '0;
+                rs1_reg_d = '0;
+                rs2_reg_d = '0;
+                opcode_reg_d = '0;
+                reserverd_reg_d = '0;
             end
         end
     default: state_d = OPCODE;
