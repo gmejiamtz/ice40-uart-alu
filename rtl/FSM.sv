@@ -223,7 +223,6 @@ always_comb begin
             if(valid_i && ready_o && (packet_count_o != data_length)) begin
                 if(opcode_reg_q == ECHO && ready_i) begin
                     valid_o = '1;
-                    ready_o = '0;
                     data_o = data_i;
                     packet_up_i = 1;
                     state_d = COMPUTE;
