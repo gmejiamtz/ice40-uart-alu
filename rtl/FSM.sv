@@ -220,14 +220,15 @@ always_comb begin
         end
         COMPUTE: begin
             ready_o = '1;
-            if(valid_i && ready_o && (packet_count_o != (data_length +1))) begin
+            if(valid_i && ready_o && (packet_count_o != data_length)) begin
                 if(opcode_reg_q == ECHO && ready_i) begin
                     valid_o = '1;
+                    ready_o = '0;
                     data_o = data_i;
                     packet_up_i = 1;
                     state_d = COMPUTE;
                 end
-            end else if (packet_count_o == (data_length + 1)) begin
+            end else if (packet_count_o == data_length) begin
                 state_d = OPCODE;
                 data_o = '0;
                 valid_o = '0;
