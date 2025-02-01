@@ -11,7 +11,7 @@ module FSM import config_pkg::*; (
 
 logic [7:0] packet_count_o,opcode_reg_q, opcode_reg_d, reserverd_reg_q, reserverd_reg_d, lsb_reg_q, lsb_reg_d,
             msb_reg_q, msb_reg_d;
-logic packet_up_i, rs1_up_i,rs2_up_i,rs1_valid_d,rs1_valid_q,
+logic packet_up, rs1_up,rs2_up,rs1_valid_d,rs1_valid_q,
     rs2_valid_d,rs2_valid_q,start_alu,alu_busy,alu_valid,packet_count_rst;
 logic [15:0] rs1_count_o,rs2_count_o,data_length;
 logic [31:0] rs1_reg_q, rs1_reg_d, rs2_reg_q, rs2_reg_d,rs1,rs2;
@@ -57,7 +57,7 @@ bsg_counter_up_down #(.max_val_p(8'd255),
 packet_counter(
     .clk_i(clk),
     .reset_i(rst | packet_count_rst),
-    .up_i(packet_up_i),
+    .up_i(packet_up),
     .down_i(0),
     .count_o(packet_count_o)
 );
@@ -68,7 +68,7 @@ bsg_counter_up_down #(.max_val_p(16'd65535),
 rs1_counter(
     .clk_i(clk),
     .reset_i(rst),
-    .up_i(rs1_up_i),
+    .up_i(rs1_up),
     .down_i(0),
     .count_o(rs1_count_o)
 );
@@ -111,9 +111,9 @@ alu #() alu_inst(
 always_comb begin
     state_d = state_q;
     packet_count_rst = '0;
-    packet_up_i = 0;
-    rs1_up_i = 0;
-    rs2_up_i = 0;
+    packet_up = 0;
+    rs1_up = 0;
+    rs2_up = 0;
     rs1_valid_d = 0;
     rs2_valid_d = 0;
     msb_reg_d = msb_reg_q;
@@ -133,7 +133,7 @@ always_comb begin
                 ready_o = '0;
                 if((data_i == ECHO) || (data_i == ADD) || (data_i == MUL) || (data_i == DIV)) begin
                     opcode_reg_d = data_i;
-                    packet_up_i = 1;
+                    packet_up = 1;
                     state_d = OPCODE;
                     ready_o = '0;
                 end
@@ -147,7 +147,7 @@ always_comb begin
             ready_o = '1;
             if(valid_i && ready_o && (packet_count_o == 1)) begin
                 ready_o = '0;
-                packet_up_i = 1;
+                packet_up = 1;
                 state_d = RESERVED;
             end
 
@@ -160,7 +160,7 @@ always_comb begin
             if(valid_i && ready_o && (packet_count_o == 2)) begin
                 ready_o = '0;
                 lsb_reg_d = data_i;
-                packet_up_i = 1;
+                packet_up = 1;
                 state_d = LSB;
             end
 
@@ -173,7 +173,7 @@ always_comb begin
             if(valid_i && ready_o&& (packet_count_o == 3)) begin // error check for if length is less than 4
                 ready_o = '0;
                 msb_reg_d = data_i;
-                packet_up_i = 1;
+                packet_up = 1;
                 state_d = MSB;
                 //if no data just go back to expect a new opcode
             end
@@ -193,12 +193,12 @@ always_comb begin
             if(valid_i && ready_o) begin
                 ready_o = '0;
                 if((data_length != (packet_count_o)) && (rs1_count_o != 4)) begin
-                    rs1_up_i = 1;
-                    packet_up_i = 1;
+                    rs1_up = 1;
+                    packet_up = 1;
                 end else if (data_length != (packet_count_o - 4)) begin
                     rs1_valid_d = '1;
                     state_d = RS2;
-                    packet_up_i = 1;
+                    packet_up = 1;
                 end else begin
                     rs1_valid_d = '1;
                     state_d = COMPUTE;
@@ -210,8 +210,8 @@ always_comb begin
             if(valid_i && ready_o) begin
                 ready_o = '0;
                 if((data_length != (packet_count_o)) && (rs2_count_o != 4)) begin
-                    rs2_up_i = 1;
-                    packet_up_i = 1;
+                    rs2_up = 1;
+                    packet_up = 1;
                 end else begin
                     rs2_valid_d = '1;
                     state_d = COMPUTE;
@@ -224,10 +224,10 @@ always_comb begin
                 if(opcode_reg_q == ECHO && ready_i) begin
                     valid_o = '1;
                     data_o = data_i;
-                    packet_up_i = 1;
+                    packet_up = 1;
                     state_d = COMPUTE;
                 end
-            end else if (packet_count_o == data_length) begin
+            end else if ((packet_count_o == data_length)) begin
                 state_d = OPCODE;
                 data_o = '0;
                 valid_o = '0;
