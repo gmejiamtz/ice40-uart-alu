@@ -12,4 +12,18 @@ set_io -nowarn BTN_N      10
 set_io -nowarn LEDG_N     37
 
 # PMOD 2
-set_io -nowarn BTN1       20
+set_io -nowarn led_o[0]       27
+set_io -nowarn led_o[1]       25
+set_io -nowarn led_o[2]       21
+set_io -nowarn led_o[4]       26
+set_io -nowarn led_o[3]       23
+
+# PMOD 1A
+set_io -nowarn ssd_o[0]                 4
+set_io -nowarn ssd_o[1]                 2
+set_io -nowarn ssd_o[2]                47
+set_io -nowarn ssd_o[3]                45
+set_io -nowarn ssd_o[4]                 3
+set_io -nowarn ssd_o[5]                48
+set_io -nowarn ssd_o[6]                46
+set_io -nowarn ssd_o[7]                44
