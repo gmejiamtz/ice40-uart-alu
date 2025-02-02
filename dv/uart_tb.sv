@@ -12,7 +12,7 @@ always begin
     $timeformat( -3, 3, "ms", 0);
     uart_runner.reset();
     uart_runner.uart_device_send_data(8'hec); //op
-    uart_runner.uart_device_send_data(8'h00); //res
+    uart_runner.uart_device_send_data(8'hf4); //res
     uart_runner.uart_device_send_data(8'h0c); //lsb
     uart_runner.uart_device_send_data(8'h00); //msb - 8 data
     uart_runner.uart_device_send_data(8'h48);
