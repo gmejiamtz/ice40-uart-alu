@@ -15,4 +15,4 @@ rtl/FSM.sv
 rtl/select_byte.sv
 rtl/shift_8.sv
 rtl/hex2ssd.sv
-rtl/elastic_pipeline.sv
+rtl/pipeline.sv

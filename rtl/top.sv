@@ -25,7 +25,7 @@ uart_rx #(.DATA_WIDTH(8)) uart_rx_inst (
     .prescale(16'd35)
 );
 
-elastic_pipeline #(.width_p(8)) rx_to_fsm_inst(
+pipeline #(.width_p(8)) rx_to_fsm_inst(
     .clk_i(clk),
     .reset_i(rst),
     .data_i(rx_data_out),
@@ -33,14 +33,14 @@ elastic_pipeline #(.width_p(8)) rx_to_fsm_inst(
     .ready_o(rx_to_fsm_ready_out),
     .valid_o(rx_to_fsm_valid_out),
     .data_o(rx_data_q),
-    .yumi_i(fsm_is_ready)
+    .ready_i(fsm_is_ready)
 );
 
 FSM #() fsm (
     .clk(clk),
     .rst(rst),
     .data_i(rx_data_q),
-    .valid_i(rx_valid_out),
+    .valid_i(rx_to_fsm_valid_out),
     .ready_o(fsm_is_ready),  //can fsm receive rn
     .data_o(fsm_out),
     .valid_o(fsm_valid_out),
@@ -48,7 +48,7 @@ FSM #() fsm (
     .state_o(led_o)
 );
 
-elastic_pipeline #(.width_p(8)) fsm_to_tx_inst(
+pipeline #(.width_p(8)) fsm_to_tx_inst(
     .clk_i(clk),
     .reset_i(rst),
     .data_i(fsm_out),
@@ -56,7 +56,7 @@ elastic_pipeline #(.width_p(8)) fsm_to_tx_inst(
     .ready_o(fsm_to_tx_ready_o),
     .valid_o(fsm_to_tx_valid_o),
     .data_o(tx_data_q),
-    .yumi_i(tx_ready)
+    .ready_i(tx_ready)
 );
 
 uart_tx #(.DATA_WIDTH(8)) uart_tx_inst (
@@ -74,12 +74,12 @@ uart_tx #(.DATA_WIDTH(8)) uart_tx_inst (
 //debug hardware
 
 hex2ssd #() hex1 (
-    .hex_i(tx_data_q[3:0]),
+    .hex_i(rx_data_q[3:0]),
     .ssd_o(half_byte1_seg)
 );
 
 hex2ssd #() hex2 (
-    .hex_i(tx_data_q[7:4]),
+    .hex_i(rx_data_q[7:4]),
     .ssd_o(half_byte2_seg)
 );
 

@@ -133,17 +133,16 @@ always_comb begin
             ready_o = '1;
             state_o = 5'b00001;
             if( ~|packet_count_o && valid_i && ready_o) begin
-                ready_o = '0;
                 if((data_i == ECHO) || (data_i == ADD) || (data_i == MUL) || (data_i == DIV)) begin
-                    opcode_reg_d = data_i;
                     packet_up = 1;
-                    state_d = OPCODE;
                     ready_o = '0;
+                    state_d = OPCODE;
+                    opcode_reg_d = data_i;
                 end
             end
-
             if(packet_count_o == 1 && valid_i && ready_o) begin
                 state_d = RESERVED;
+                ready_o = '1;
             end
         end
         RESERVED: begin
@@ -153,10 +152,12 @@ always_comb begin
                 ready_o = '0;
                 packet_up = 1;
                 state_d = RESERVED;
+                reserverd_reg_d = data_i;
             end
 
             if(packet_count_o == 2 && valid_i && ready_o) begin
                 state_d = LSB;
+                ready_o = '1;
             end
         end
         LSB: begin
@@ -164,13 +165,14 @@ always_comb begin
             ready_o = '1;
             if(valid_i && ready_o && (packet_count_o == 2)) begin
                 ready_o = '0;
-                lsb_reg_d = data_i;
                 packet_up = 1;
                 state_d = LSB;
+                lsb_reg_d = data_i;
             end
 
             if(packet_count_o == 3 && valid_i && ready_o) begin
                 state_d = MSB;
+                ready_o = '1;
             end
         end
         MSB: begin
@@ -178,17 +180,17 @@ always_comb begin
             ready_o = '1;
             if(valid_i && ready_o&& (packet_count_o == 3)) begin // error check for if length is less than 4
                 ready_o = '0;
-                msb_reg_d = data_i;
                 packet_up = 1;
                 state_d = MSB;
-                //if no data just go back to expect a new opcode
+                msb_reg_d = data_i;
             end
             if(packet_count_o == 4 && valid_i && ready_o) begin
+                ready_o = '1;
+                //if no data just go back to expect a new opcode
                 if(data_length == 0) begin
                     state_d = OPCODE;
                 end else if(opcode_reg_q == ECHO) begin
                     state_d = COMPUTE;
-                    data_o = valid_i ? data_i : '0;
                 end else begin
                     state_d = RS1;
                 end
@@ -238,6 +240,7 @@ always_comb begin
                     state_d = COMPUTE;
                 end
             end else if ((packet_count_o == data_length)) begin
+                ready_o = '1;
                 state_d = OPCODE;
                 lsb_reg_d = '0;
                 msb_reg_d = '0;
