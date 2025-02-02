@@ -5,7 +5,6 @@ localparam DATA_WIDTH_P = 8;
 
 reg CLK;
 reg BTN_N = 0;
-reg BTN1 = 0;
 logic RX,TX;
 
 //uart_device signals
@@ -26,7 +25,7 @@ initial begin
     end
 end
 
-localparam realtime ClockPeriod = 36.036ns;
+localparam realtime ClockPeriod = 31.000ns;
 
 
 logic pll_out;
@@ -73,11 +72,11 @@ task automatic reset;
     uart_device_tready_i <= '0;
     uart_device_tvalid_i <= '0;
     repeat (5) begin
-        @(posedge CLK);
+        @(posedge pll_out);
     end
     BTN_N <= 1;
     repeat (5) begin
-        @(posedge CLK);
+        @(posedge pll_out);
     end
 endtask
 
@@ -85,14 +84,14 @@ task automatic uart_device_send_data(input [7:0] data_in);
     uart_device_data_i <= data_in;
     uart_device_tvalid_i <= 1;
     $info("Sending %h\n",data_in);
-    @(posedge CLK);
+    @(posedge pll_out);
     uart_device_tvalid_i <= 0;
     @(negedge uart_device_tx_busy_o);
 endtask
 
 task automatic wait_cycle(integer n);
     repeat (n) begin
-        @(posedge CLK);
+        @(posedge pll_out);
     end
 endtask
 
