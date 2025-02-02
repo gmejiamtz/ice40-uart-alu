@@ -17,7 +17,7 @@ uart_rx #(.DATA_WIDTH(8)) uart_rx_inst (
     .rst(rst),
     .m_axis_tdata(rx_data_out), // output
     .m_axis_tvalid(rx_valid_out), // output
-    .m_axis_tready(fsm_is_ready), // input
+    .m_axis_tready(rx_to_fsm_ready_out), // input
     .rxd(rx_i),
     .busy(),
     .overrun_error(),
