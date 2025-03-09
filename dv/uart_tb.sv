@@ -13,11 +13,11 @@ always begin
     uart_runner.reset();
     $display("Echo - Hi010203040506");
     //send echo Hi123456 - 0xec_xx_0c_00_48_69_01_02_03_04_05_06
-    uart_runner.uart_device_send_data(8'hec); //op
-    uart_runner.uart_device_send_data(8'hf4); //res
+    uart_runner.uart_device_send_data(8'had); //op
+    uart_runner.uart_device_send_data(8'h00); //res
     uart_runner.uart_device_send_data(8'h0c); //lsb
     uart_runner.uart_device_send_data(8'h00); //msb - 8 data
-    uart_runner.uart_device_send_data(8'h48);
+    uart_runner.uart_device_send_data(8'h42);
     uart_runner.uart_device_send_data(8'h69);
     uart_runner.uart_device_send_data(8'h01);
     uart_runner.uart_device_send_data(8'h02);
@@ -28,8 +28,8 @@ always begin
     uart_runner.wait_cycle(10000);
     $display("Echo - 1 2");
     //send add 1 2 - 0xad_xx_0c_00_00_00_00_01_00_00_00_02
-    uart_runner.uart_device_send_data(8'had); //op
-    uart_runner.uart_device_send_data(8'hf4); //res
+    uart_runner.uart_device_send_data(8'hec); //op
+    uart_runner.uart_device_send_data(8'h00); //res
     uart_runner.uart_device_send_data(8'h0c); //lsb
     uart_runner.uart_device_send_data(8'h00); //msb - 8 data
     uart_runner.uart_device_send_data(8'hDE);

@@ -71,7 +71,7 @@ always_comb begin
     data2_reg_d = '0;
     valid_o = '0;
     packets_to_process = ~|top_byte_i ? 3'd4 : top_byte_i;
-    data_o = '0;
+    // data_o = '0;
     if(data1_valid_i & start_alu_i & ~busy_o) begin
         data1_reg_d = data1_i;
         busy_d = 1;
@@ -84,27 +84,34 @@ always_comb begin
     case(opcode_i)
         //echo
         8'hEC: begin
-            if(busy_o) begin
-                valid_o = '1;
-                if(add_echo_packet_count != packets_to_process) begin
-                    busy_d = '1;
-                    data_o = byte_selected;
-                    data1_reg_d = data2_reg_q << 8;
-                end else begin
-                    busy_d = '0;
-                end
-            end
+            // if(busy_o) begin
+            //     valid_o = '1;
+            //     if(add_echo_packet_count != packets_to_process) begin
+            //         busy_d = '1;
+            //         data_o = byte_selected;
+            //         data1_reg_d = data2_reg_q << 8;
+            //     end else begin
+            //         busy_d = '0;
+            //     end
+            // end
         end
         //addition
-        8'hAD: data_o = '0;
+        8'hAD: begin
+            if((data1_valid_i && data2_valid_i) && start_alu_i) begin
+                valid_o = '1;
+                data_o = data1_i + data2_i;
+            end else begin
+                busy_d = '0;
+            end
+        end
 
         //multiply
-        8'hAC: data_o = '0;
+        // 8'hAC: data_o = '0;
 
-        //division, we need to change this
-        //sean was thinking we do a system where we take the first rx_i then divide by 1,
-        //and then on the next loop of the compute stage we do intermediate variable divided by the next rx_i
-        8'hD1: data_o = data1_i / data2_i;
+        // //division, we need to change this
+        // //sean was thinking we do a system where we take the first rx_i then divide by 1,
+        // //and then on the next loop of the compute stage we do intermediate variable divided by the next rx_i
+        // 8'hD1: data_o = data1_i / data2_i;
 
         default : data_o = data1_i;
     endcase
