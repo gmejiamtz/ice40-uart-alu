@@ -3,9 +3,9 @@ module alu import config_pkg::*; (
     input rst,
     input [7:0] opcode_i,
     input [1:0] top_byte_i,
-    input [32:0] data1_i,
+    input [31:0] data1_i,
     input data1_valid_i,
-    input [32:0] data2_i,
+    input [31:0] data2_i,
     input data2_valid_i,
     input start_alu_i,
     output logic [63:0] data_o,
@@ -18,6 +18,7 @@ logic [5:0] shift_amount;
 logic [2:0] add_echo_packet_count,packets_to_process;
 logic add_echo_packet_up,busy_q,busy_d;
 logic [7:0] byte_selected;
+logic [63:0] mult_o;
 
 always_ff @(posedge clk) begin
     if(rst) begin
@@ -57,6 +58,13 @@ select_byte select_byte_inst(
     .shift_amount_o(shift_amount)
 );
 
+// bsg_mul #(.width_p(32)) multiply_inst(
+//     .x_i(data1_i),
+//     .y_i(data2_i),
+//     .signed_i(1),
+//     .z_o(mult_o)
+// );
+
 //note: probably need to switch add,mult,div to use basejump stl modules
 
 //note: need to fix alu. ethan told sean that alu can only have clk,rst, rx_i, and tx_o as i/o ports.
@@ -70,6 +78,7 @@ always_comb begin
     data1_reg_d = '0;
     data2_reg_d = '0;
     valid_o = '0;
+    data_o = 0;
     packets_to_process = ~|top_byte_i ? 3'd4 : top_byte_i;
     // data_o = '0;
     if(data1_valid_i & start_alu_i & ~busy_o) begin
@@ -106,14 +115,21 @@ always_comb begin
         end
 
         //multiply
-        // 8'hAC: data_o = '0;
+        // 8'hAC: begin
+        //     if((data1_valid_i && data2_valid_i) && start_alu_i) begin
+        //         valid_o = '1;
+        //         data_o = mult_o;
+        //     end else begin
+        //         busy_d = '0;
+        //     end
+        // end
 
         // //division, we need to change this
         // //sean was thinking we do a system where we take the first rx_i then divide by 1,
         // //and then on the next loop of the compute stage we do intermediate variable divided by the next rx_i
         // 8'hD1: data_o = data1_i / data2_i;
 
-        default : data_o = data1_i;
+        // default : data_o = data1_i;
     endcase
 end
 

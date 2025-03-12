@@ -17,7 +17,7 @@ logic packet_up, rs1_up,rs2_up,rs1_valid_d,rs1_valid_q,
     rs1_reset,rs2_reset, out_count_up;
 logic [15:0] out_count_o, rs1_count_o,rs2_count_o,data_length;
 logic [31:0] rs1_reg_q, rs1_reg_d, rs2_reg_q, rs2_reg_d,rs1,rs2;
-logic [63:0] alu_out_d, alu_out_q, alu_reg_q, alu_reg_d;
+logic [63:0] alu_out, alu_out_d, alu_out_q, alu_reg_q, alu_reg_d;
 state_t state_q, state_d;
 always_ff @(posedge clk) begin
     if(rst) begin
@@ -110,7 +110,7 @@ shift_8 #() rs1_shift(
     .rst(rst),
     .en_i(rs1_en_i),
     .data_i(data_i),
-    .data_o(rs1_reg_q)
+    .data_o(rs1_reg_d)
 );
 
 logic rs2_en_i;
@@ -119,7 +119,7 @@ shift_8 #() rs2_shift(
     .rst(rst),
     .en_i(rs2_en_i),
     .data_i(data_i),
-    .data_o(rs2_reg_q)
+    .data_o(rs2_reg_d)
 );
 
 // always_ff @(posedge clk) begin
@@ -142,7 +142,7 @@ alu #() alu_inst(
     .data2_i(rs2_reg_q),
     .data2_valid_i(rs2_valid_q),
     .start_alu_i(start_alu_q),
-    .data_o(alu_out_d),
+    .data_o(alu_out),
     .busy_o(alu_busy),
     .valid_o(alu_valid)
 );
@@ -170,8 +170,8 @@ always_comb begin
     lsb_reg_d = lsb_reg_q;
     opcode_reg_d = opcode_reg_q;
     reserverd_reg_d = reserverd_reg_q;
-    rs1_reg_d = rs1_reg_q;
-    rs2_reg_d = rs2_reg_q;
+    // rs1_reg_d = rs1_reg_q;
+    // rs2_reg_d = rs2_reg_q;
     valid_o = '0;
     ready_o = '0;
     data_o = '0;
@@ -250,6 +250,10 @@ always_comb begin
             ready_o = '1;
             rs1_reset = 0;
             state_o = 5'b00101;
+            // if(opcode_reg_q == ECHO) begin
+            //     state_d = COMPUTE;
+            // end
+
             if(valid_i && ready_o) begin
                 if((data_length != (packet_count_o)) && rs1_count_o != 4) begin
                     rs1_up = 1;
@@ -302,6 +306,7 @@ always_comb begin
                 if(opcode_reg_q == ADD && ready_i) begin
                     if(alu_valid) begin
                         state_d = SHIFT;
+                        alu_out_d = alu_out;
                     end
                 end else begin
                     ready_o = '1;
@@ -309,8 +314,8 @@ always_comb begin
                     out_count_reset = 1;
                     lsb_reg_d = '0;
                     msb_reg_d = '0;
-                    rs1_reg_d = '0;
-                    rs2_reg_d = '0;
+                    rs1_reset = 1;
+                    rs2_reset = 1;
                     opcode_reg_d = '0;
                     reserverd_reg_d = '0;
                     packet_count_rst = '1;
@@ -322,18 +327,25 @@ always_comb begin
 
         SHIFT: begin
             state_o = 5'b01000;
-            if(out_count_o != 9) begin
-                data_o = alu_out_q[63:56];
-                alu_out_d = alu_out_q << 8;
-                out_count_up = 1;
+            ready_o = '1;
+            if((out_count_o != 8)) begin
+                if(ready_i) begin
+                    data_o = alu_out_q[63:56];
+                    alu_out_d = alu_out_q << 8;
+                    out_count_up = 1;
+                    valid_o = '1;
+                    state_d = SHIFT;
+                end else begin
+                    alu_out_d = alu_out_q;
+                end
             end else begin
                 ready_o = '1;
                 state_d = OPCODE;
                 out_count_reset = 1;
                 lsb_reg_d = '0;
                 msb_reg_d = '0;
-                rs1_reg_d = '0;
-                rs2_reg_d = '0;
+                rs1_reset = 1;
+                rs2_reset = 1;
                 opcode_reg_d = '0;
                 reserverd_reg_d = '0;
                 packet_count_rst = '1;
