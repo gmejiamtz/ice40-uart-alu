@@ -16,15 +16,17 @@ module alu import config_pkg::*; (
 logic [32:0] add_init_const, mult_init_const,data1_reg_d,data1_reg_q,data2_reg_d,data2_reg_q;
 logic [5:0] shift_amount;
 logic [2:0] add_echo_packet_count,packets_to_process;
-logic add_echo_packet_up,busy_q,busy_d;
+logic add_echo_packet_up,busy_q,busy_d, mult_valid, mult_flag_d, mult_flag_q, div_flag_d, div_flag_q, div_valid;
 logic [7:0] byte_selected;
-logic [63:0] mult_o;
+logic [63:0] mult_o, div_o;
 
 always_ff @(posedge clk) begin
     if(rst) begin
         busy_q <= '0;
+        mult_flag_q <= '0;
     end else begin
         busy_q <= busy_d;
+        mult_flag_q <= mult_flag_d;
     end
 end
 
@@ -58,12 +60,38 @@ select_byte select_byte_inst(
     .shift_amount_o(shift_amount)
 );
 
-// bsg_mul #(.width_p(32)) multiply_inst(
-//     .x_i(data1_i),
-//     .y_i(data2_i),
-//     .signed_i(1),
-//     .z_o(mult_o)
-// );
+bsg_imul_iterative #(.width_p(32)) imul_inst (
+    .clk_i(clk),
+    .reset_i(rst),
+    .v_i(start_alu_i),
+    .ready_and_o(),
+    .opA_i(data1_i),
+    .signed_opA_i(1'b1),
+    .opB_i(data2_i),
+    .signed_opB_i(1'b1),
+    .gets_high_part_i(1'b0),
+    .v_o(mult_valid),
+    .result_o(mult_o),
+    .yumi_i(1'b1)
+);
+
+bsg_idiv_iterative #(.width_p(32), .bitstack_p(0), .bits_per_iter_p(1)) idiv_inst (
+    .clk_i(clk),
+    .reset_i(rst),
+    .v_i(start_alu_i),
+    .ready_and_o(),
+    .dividend_i(data1_i),
+    .divisor_i(data2_i),
+    .signed_div_i(1'b1),
+    .v_o(div_valid),
+    .quotient_o(div_o),
+    .remainder_o(),
+    .yumi_i(1'b1)
+);
+
+wire mult_flag, div_flag;
+assign mult_flag = (opcode_i == 8'hAC);
+assign div_flag = (opcode_i == 8'hD1);
 
 //note: probably need to switch add,mult,div to use basejump stl modules
 
@@ -79,6 +107,7 @@ always_comb begin
     data2_reg_d = '0;
     valid_o = '0;
     data_o = 0;
+    mult_flag_d = 0;
     packets_to_process = ~|top_byte_i ? 3'd4 : top_byte_i;
     // data_o = '0;
     if(data1_valid_i & start_alu_i & ~busy_o) begin
@@ -115,21 +144,34 @@ always_comb begin
         end
 
         //multiply
-        // 8'hAC: begin
-        //     if((data1_valid_i && data2_valid_i) && start_alu_i) begin
-        //         valid_o = '1;
-        //         data_o = mult_o;
-        //     end else begin
-        //         busy_d = '0;
-        //     end
-        // end
+        8'hAC: begin
+            if(((data1_valid_i && data2_valid_i) && start_alu_i) || mult_flag_q) begin
+                mult_flag_d = mult_flag;
+                if(mult_valid) begin
+                    data_o = mult_o;
+                    valid_o = 1;
+                    mult_flag_d = 0;
+                end
+            end else begin
+                busy_d = '0;
+            end
+        end
 
-        // //division, we need to change this
-        // //sean was thinking we do a system where we take the first rx_i then divide by 1,
-        // //and then on the next loop of the compute stage we do intermediate variable divided by the next rx_i
-        // 8'hD1: data_o = data1_i / data2_i;
+        //division
+        8'hD1: begin
+            if(((data1_valid_i && data2_valid_i) && start_alu_i) || div_flag_q) begin
+                div_flag_d = div_flag;
+                if(div_valid) begin
+                    data_o = div_o;
+                    valid_o = 1;
+                    div_flag_d = 0;
+                end
+            end else begin
+                busy_d = '0;
+            end
+        end
 
-        // default : data_o = data1_i;
+        default : data_o = data1_i;
     endcase
 end
 

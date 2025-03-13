@@ -182,7 +182,7 @@ always_comb begin
             ready_o = '1;
             state_o = 5'b00001;
             if( ~|packet_count_o && valid_i && ready_o) begin
-                if((data_i == ECHO) || (data_i == ADD) || (data_i == MUL) || (data_i == DIV)) begin
+                if((data_i == ECHO) || (data_i == ADD) || (data_i == MUL) || (data_i == 8'hD1)) begin
                     packet_up = 1;
                     ready_o = '0;
                     state_d = OPCODE;
@@ -303,10 +303,12 @@ always_comb begin
                     state_d = COMPUTE;
                 end
             end else if ((packet_count_o == data_length)) begin
-                if(opcode_reg_q == ADD && ready_i) begin
+                if((opcode_reg_q == ADD || opcode_reg_q == MUL || opcode_reg_q == 8'hD1) && ready_i) begin
                     if(alu_valid) begin
                         state_d = SHIFT;
                         alu_out_d = alu_out;
+                    end else if(opcode_reg_q == MUL || opcode_reg_q == 8'hD1) begin
+                        state_d = COMPUTE;
                     end
                 end else begin
                     ready_o = '1;
