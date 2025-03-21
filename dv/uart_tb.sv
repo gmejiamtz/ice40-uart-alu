@@ -41,19 +41,19 @@ always begin
     uart_runner.uart_device_send_data(8'h31);
     uart_runner.uart_device_send_data(8'hab);
     uart_runner.wait_cycle(10000);
-    // uart_runner.uart_device_send_data(8'hac); //op
-    // uart_runner.uart_device_send_data(8'h00); //res
-    // uart_runner.uart_device_send_data(8'h0c); //lsb
-    // uart_runner.uart_device_send_data(8'h00); //msb - 8 data
-    // uart_runner.uart_device_send_data(8'h00);
-    // uart_runner.uart_device_send_data(8'h00);
-    // uart_runner.uart_device_send_data(8'h00);
-    // uart_runner.uart_device_send_data(8'h03);
-    // uart_runner.uart_device_send_data(8'h00);
-    // uart_runner.uart_device_send_data(8'h00);
-    // uart_runner.uart_device_send_data(8'h00);
-    // uart_runner.uart_device_send_data(8'h02);
-    // uart_runner.wait_cycle(10000);
+    uart_runner.uart_device_send_data(8'hac); //op
+    uart_runner.uart_device_send_data(8'h00); //res
+    uart_runner.uart_device_send_data(8'h0c); //lsb
+    uart_runner.uart_device_send_data(8'h00); //msb - 8 data
+    uart_runner.uart_device_send_data(8'h00);
+    uart_runner.uart_device_send_data(8'h00);
+    uart_runner.uart_device_send_data(8'h00);
+    uart_runner.uart_device_send_data(8'h03);
+    uart_runner.uart_device_send_data(8'h00);
+    uart_runner.uart_device_send_data(8'h00);
+    uart_runner.uart_device_send_data(8'h00);
+    uart_runner.uart_device_send_data(8'h02);
+    uart_runner.wait_cycle(10000);
     $display( "End simulation." );
     $finish;
 end
