@@ -6,6 +6,8 @@ localparam DATA_WIDTH_P = 8;
 logic clk_i;
 logic rst;
 logic top_tx, top_rx;
+logic [4:0] led_o;
+logic [7:0] ssd_o;
 
 //uart_device signals
 logic [DATA_WIDTH_P-1:0] uart_device_data_i, uart_device_data_o;
@@ -31,7 +33,9 @@ end
 top #() top_uut (.clk(clk_i),
     .rst(rst),
     .rx_i(top_rx),
-    .tx_o(top_tx)
+    .tx_o(top_tx),
+    .led_o(led_o),
+    .ssd_o(ssd_o)
 );
 
 uart #() uart_device(
