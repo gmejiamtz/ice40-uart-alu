@@ -18,3 +18,7 @@ dv/uart_tb.sv
 -Werror-IMPLICIT
 -Werror-USERERROR
 -Werror-LATCH
+-Wno-WIDTHTRUNC
+-Wno-WIDTHEXPAND
+-Wno-UNUSEDSIGNAL
+-Wno-UNDRIVEN
