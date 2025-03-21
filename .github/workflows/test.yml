@@ -12,7 +12,10 @@ jobs:
           submodules: recursive
       - name: Download Tools
         run: |
-          wget -O - https://raw.githubusercontent.com/sifferman/hdl-tool-installer/main/install | bash -s -- . --oss-cad-suite --zachjs-sv2v
+          sudo apt update
+          sudo apt install -y unzip wget
+          wget https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2024-11-21/oss-cad-suite-linux-x64-20241121.tgz && tar -xf oss-cad-suite-linux-x64-20241121.tgz && export PATH="./oss-cad-suite/bin:$PATH"
+          wget https://github.com/zachjs/sv2v/releases/download/v0.0.12/sv2v-Linux.zip && unzip sv2v-Linux.zip && export PATH="./sv2v-Linux/:$PATH"
           echo "$GITHUB_WORKSPACE/oss-cad-suite/bin" >> $GITHUB_PATH
           echo "$GITHUB_WORKSPACE/zachjs-sv2v" >> $GITHUB_PATH
 

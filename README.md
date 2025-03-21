@@ -22,7 +22,7 @@ To open a waveform do the following steps:
 
 1. Open the ports tab- this is found in the `Ports` tab of the VSCode Terminal as shown below
 
-![Terminal Port Page](docs/terminal_ports_page.png)
+[Terminal Port Page](docs/terminal_ports_page.png)
 
 2. Hover over the `Forwarded Address` column and click on the `Open in Browser` icon/middle icon
 
@@ -43,4 +43,4 @@ gtkwave $PATH_TO_WAVEFORM_FILE
 8. Use GTKWave as needed
     - Below is an image of what the lite desktop should look with GTKWave open with no file
 
-![GTKWave in noVNC desktop](docs/lite_desktop_gtkwave.png)
+[GTKWave in noVNC desktop](docs/lite_desktop_gtkwave.png)
